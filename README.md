@@ -1,3 +1,7 @@
+***WORK IN PROGRESS***
+
+These packages are tentative and are likely to change in the future.
+
 # texpack
 
 `texpack` is a texture packer with both image and font support in the same atlas.
