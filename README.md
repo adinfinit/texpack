@@ -18,3 +18,4 @@ go get github.com/loov/texpack
 ## Notes
 
 * Does not support OpenType font kerning -- limitation of `github.com/golang/freetype`.
+* SDF generation is not yet good
