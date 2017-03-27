@@ -2,7 +2,54 @@ package maxrect
 
 import "image"
 
-func (context *Context) BestShortSideFit(size image.Point) (image.Rectangle, int, int) {
+type Rule byte
+
+const (
+	Automatic Rule = iota
+	ShortSide
+	LongSide
+	BottomLeft
+	Area
+	ContactPoint
+)
+
+func ParseRule(s string) Rule {
+	switch s {
+	case "short-side":
+		return ShortSide
+	case "long-side":
+		return LongSide
+	case "bottom-left":
+		return BottomLeft
+	case "area":
+		return Area
+	case "contact-point":
+		return ContactPoint
+	default:
+		return Automatic
+	}
+}
+
+func (context *Context) SetRule(rule Rule) {
+	switch rule {
+	case Automatic:
+		context.Score = context.ContactPoint
+	case ShortSide:
+		context.Score = context.ShortSide
+	case LongSide:
+		context.Score = context.LongSide
+	case BottomLeft:
+		context.Score = context.BottomLeft
+	case Area:
+		context.Score = context.Area
+	case ContactPoint:
+		context.Score = context.ContactPoint
+	default:
+		panic("unknown rule")
+	}
+}
+
+func (context *Context) ShortSide(size image.Point) (image.Rectangle, int, int) {
 	return FindBest(context.Free, size, context.Rotate,
 		func(free image.Rectangle, size image.Point) (int, int) {
 			leftX, leftY := free.Dx()-size.X, free.Dy()-size.Y
@@ -14,7 +61,7 @@ func (context *Context) BestShortSideFit(size image.Point) (image.Rectangle, int
 		})
 }
 
-func (context *Context) BestLongSideFit(size image.Point) (image.Rectangle, int, int) {
+func (context *Context) LongSide(size image.Point) (image.Rectangle, int, int) {
 	return FindBest(context.Free, size, context.Rotate,
 		func(free image.Rectangle, size image.Point) (int, int) {
 			leftX, leftY := free.Dx()-size.X, free.Dy()-size.Y
@@ -26,14 +73,14 @@ func (context *Context) BestLongSideFit(size image.Point) (image.Rectangle, int,
 		})
 }
 
-func (context *Context) BottomLeftRule(size image.Point) (image.Rectangle, int, int) {
+func (context *Context) BottomLeft(size image.Point) (image.Rectangle, int, int) {
 	return FindBest(context.Free, size, context.Rotate,
 		func(free image.Rectangle, size image.Point) (int, int) {
 			return free.Min.Y + size.Y, free.Min.X
 		})
 }
 
-func (context *Context) BestAreaFit(size image.Point) (image.Rectangle, int, int) {
+func (context *Context) Area(size image.Point) (image.Rectangle, int, int) {
 	area := size.X * size.Y
 	return FindBest(context.Free, size, context.Rotate,
 		func(free image.Rectangle, size image.Point) (int, int) {
@@ -45,7 +92,7 @@ func (context *Context) BestAreaFit(size image.Point) (image.Rectangle, int, int
 		})
 }
 
-func (context *Context) ContactPointRule(size image.Point) (image.Rectangle, int, int) {
+func (context *Context) ContactPoint(size image.Point) (image.Rectangle, int, int) {
 	return FindBest(context.Free, size, context.Rotate,
 		func(free image.Rectangle, size image.Point) (int, int) {
 			contact := maxInt

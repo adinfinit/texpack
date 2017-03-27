@@ -14,3 +14,7 @@ go get github.com/loov/texpack
 * `maxrect` - is a MaxRects implementation
 * `pack` - implements utilities for interfacing with maxrect
 * `sdf` - implements signed-distance-field generation
+
+## Notes
+
+* Does not support OpenType font kerning -- limitation of `github.com/golang/freetype`.

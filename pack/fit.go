@@ -39,11 +39,11 @@ func BoxesToSizes(boxes []Box) []image.Point {
 	return sizes
 }
 
-func PlaceBoxes(maxContextSize image.Point, boxes []Box) (contextSize image.Point, ok bool) {
+func PlaceBoxes(maxContextSize image.Point, rule maxrect.Rule, boxes []Box) (contextSize image.Point, ok bool) {
 	sizes := BoxesToSizes(boxes)
 
 	var rects []image.Rectangle
-	contextSize, rects, ok = minimizeFit(maxContextSize, sizes)
+	contextSize, rects, ok = minimizeFit(maxContextSize, rule, sizes)
 	for i := range rects {
 		box := &boxes[i]
 		*box.Place = rects[i].Inset(box.Padding)
@@ -52,9 +52,16 @@ func PlaceBoxes(maxContextSize image.Point, boxes []Box) (contextSize image.Poin
 	return
 }
 
-func minimizeFit(maxContextSize image.Point, sizes []image.Point) (contextSize image.Point, rects []image.Rectangle, ok bool) {
+func minimizeFit(maxContextSize image.Point, rule maxrect.Rule, sizes []image.Point) (contextSize image.Point, rects []image.Rectangle, ok bool) {
+
+	try := func(size image.Point) ([]image.Rectangle, bool) {
+		context := maxrect.New(size)
+		context.SetRule(rule)
+		return context.Adds(sizes...)
+	}
+
 	contextSize = maxContextSize
-	rects, ok = maxrect.New(contextSize).Adds(sizes...)
+	rects, ok = try(contextSize)
 	if !ok {
 		return
 	}
@@ -64,7 +71,7 @@ func minimizeFit(maxContextSize image.Point, sizes []image.Point) (contextSize i
 		shrunk = false
 		if shrinkX {
 			trySize := image.Point{contextSize.X - 128, contextSize.Y}
-			tryRects, tryOk := maxrect.New(trySize).Adds(sizes...)
+			tryRects, tryOk := try(trySize)
 			if tryOk {
 				contextSize = trySize
 				rects = tryRects
@@ -76,7 +83,7 @@ func minimizeFit(maxContextSize image.Point, sizes []image.Point) (contextSize i
 
 		if shrinkY {
 			trySize := image.Point{contextSize.X, contextSize.Y - 128}
-			tryRects, tryOk := maxrect.New(trySize).Adds(sizes...)
+			tryRects, tryOk := try(trySize)
 			if tryOk {
 				contextSize = trySize
 				rects = tryRects

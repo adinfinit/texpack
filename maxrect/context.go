@@ -19,7 +19,7 @@ type Context struct {
 func New(size image.Point) *Context {
 	context := &Context{}
 	context.Size = size
-	context.Score = context.BottomLeftRule
+	context.Score = context.BottomLeft
 	context.Free = append(context.Free, image.Rect(0, 0, size.X, size.Y))
 	return context
 }

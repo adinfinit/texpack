@@ -24,6 +24,7 @@ type Font struct {
 	Padding   int
 	MaxBounds fixed.Rectangle26_6
 	Glyphs    map[rune]*Glyph
+	Kern      map[[2]rune]fixed.Int26_6
 }
 
 func LoadFont(name, filename string, fontSize int) (*Font, error) {
@@ -48,6 +49,7 @@ func LoadFont(name, filename string, fontSize int) (*Font, error) {
 	font.Face = face
 	font.MaxBounds = fnt.Bounds(fixed.I(fontSize))
 	font.Glyphs = make(map[rune]*Glyph, 256)
+	font.Kern = make(map[[2]rune]fixed.Int26_6, 256)
 
 	return font, nil
 }
@@ -86,7 +88,9 @@ func (font *Font) Include(r rune) bool {
 	if _, ok := font.Glyphs[r]; ok {
 		return false
 	}
-	if !unicode.IsGraphic(r) {
+
+	// skip non-graphic and combining marks
+	if !unicode.IsGraphic(r) || unicode.IsMark(r) {
 		return false
 	}
 
@@ -97,25 +101,32 @@ func (font *Font) Include(r rune) bool {
 
 	font.Font.Index(r)
 	g.Bounds, g.Advance, ok = font.Face.GlyphBounds(r)
-	if !ok || g.Bounds.Empty() {
+	if !ok {
 		fmt.Println("no glyph ", g.Rune)
 		return false
 	}
 
-	g.Size.X = ceilPx(g.Bounds.Max.X - g.Bounds.Min.X)
-	g.Size.Y = ceilPx(g.Bounds.Max.Y - g.Bounds.Min.Y)
+	g.Size.X = (g.Bounds.Max.X - g.Bounds.Min.X).Ceil()
+	g.Size.Y = (g.Bounds.Max.Y - g.Bounds.Min.Y).Ceil()
 
 	g.Size.X += 2
 	g.Size.Y += 2
 
 	font.Glyphs[r] = g
+	font.includeKern(r)
 
 	return true
 }
 
-func ceilPx(i fixed.Int26_6) int {
-	const ceiling = 1<<6 - 1
-	return int(i+ceiling) >> 6
+func (font *Font) includeKern(x rune) {
+	for b := range font.Glyphs {
+		if k := font.Face.Kern(x, b); k != 0 {
+			font.Kern[[2]rune{x, b}] = k
+		}
+		if k := font.Face.Kern(b, x); k != 0 {
+			font.Kern[[2]rune{b, x}] = k
+		}
+	}
 }
 
 //

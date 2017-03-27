@@ -22,6 +22,8 @@ var (
 	atlasimage = flag.String("atlas", "atlas.png", "output image")
 	atlasdata  = flag.String("data", "atlas.json", "output description")
 
+	place = flag.String("place", "automatic", "placing algorithm (short-side, long-side, bottom-left, area, contact-point)")
+
 	debug      = flag.Bool("debug-size", false, "debug box sizes")
 	debugPlace = flag.Bool("debug-place", false, "debug placing gif")
 )
@@ -73,7 +75,7 @@ func main() {
 	}
 	pack.SortBoxes(boxes)
 
-	size, ok := pack.PlaceBoxes(maxSize, boxes)
+	size, ok := pack.PlaceBoxes(maxSize, maxrect.ParseRule(*place), boxes)
 	if !ok {
 		fmt.Println("images do not fit")
 		return
@@ -89,6 +91,7 @@ func main() {
 	}
 	for _, f := range fonts {
 		f.Draw(dst)
+		fmt.Println(len(f.Kern))
 	}
 
 	if *debug {
@@ -121,6 +124,7 @@ func WritePlacingGif(size image.Point, boxes []pack.Box, outfile string) {
 
 	out := &gif.GIF{}
 	context := maxrect.New(size)
+	context.SetRule(maxrect.ParseRule(*place))
 	context.DebugPlace = func(r image.Rectangle) {
 		pal := image.NewPaletted(image.Rectangle{image.ZP, size}, palette)
 		for _, r := range context.Used {
