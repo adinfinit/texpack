@@ -1,3 +1,4 @@
+// maxrect implements MaxRects algorithm
 package maxrect
 
 import "image"

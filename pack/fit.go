@@ -1,3 +1,4 @@
+// pack implements packing common things
 package pack
 
 import (
