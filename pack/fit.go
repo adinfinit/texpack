@@ -42,6 +42,8 @@ func BoxesToSizes(boxes []Box) []image.Point {
 func PlaceBoxes(maxContextSize image.Point, rule maxrect.Rule, boxes []Box) (contextSize image.Point, ok bool) {
 	sizes := BoxesToSizes(boxes)
 
+	//TODO: when rule == maxrect.Automatic, try all rules
+
 	var rects []image.Rectangle
 	contextSize, rects, ok = minimizeFit(maxContextSize, rule, sizes)
 	for i := range rects {

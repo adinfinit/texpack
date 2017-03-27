@@ -8,6 +8,7 @@ import (
 
 	"github.com/loov/texpack/maxrect"
 	"github.com/loov/texpack/pack"
+	"github.com/loov/texpack/sdf"
 
 	"image/color"
 	"image/gif"
@@ -23,6 +24,8 @@ var (
 	atlasdata  = flag.String("data", "atlas.json", "output description")
 
 	place = flag.String("place", "automatic", "placing algorithm (short-side, long-side, bottom-left, area, contact-point)")
+
+	sdfRadius = flag.Int("sdf-radius", 0, "use alpha channel for distance field")
 
 	debug      = flag.Bool("debug-size", false, "debug box sizes")
 	debugPlace = flag.Bool("debug-place", false, "debug placing gif")
@@ -91,7 +94,10 @@ func main() {
 	}
 	for _, f := range fonts {
 		f.Draw(dst)
-		fmt.Println(len(f.Kern))
+	}
+
+	if *sdfRadius > 0 {
+		sdf.ApplyRGBA_Alpha(dst, *sdfRadius)
 	}
 
 	if *debug {
