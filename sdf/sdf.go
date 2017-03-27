@@ -125,14 +125,6 @@ func ApplyRGBA_Alpha(m *image.RGBA, radius int) {
 				low.Set(x, y, empty.Offset(-afi*0.5))
 				high.Set(x, y, inside.Offset(af*0.5))
 			}
-
-			if af < 0.5 {
-				low.Set(x, y, inside)
-				high.Set(x, y, empty)
-			} else {
-				low.Set(x, y, empty)
-				high.Set(x, y, inside)
-			}
 		}
 	}
 

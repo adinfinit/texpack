@@ -1,10 +1,12 @@
 package main
 
 import (
+	"encoding/json"
 	"flag"
 	"fmt"
 	"image"
 	"os"
+	"path/filepath"
 
 	"github.com/loov/texpack/maxrect"
 	"github.com/loov/texpack/pack"
@@ -15,15 +17,12 @@ import (
 	"image/png"
 )
 
-const (
-	defaultPadding = 6
-)
-
 var (
 	atlasimage = flag.String("atlas", "atlas.png", "output image")
 	atlasdata  = flag.String("data", "atlas.json", "output description")
 
-	place = flag.String("place", "automatic", "placing algorithm (short-side, long-side, bottom-left, area, contact-point)")
+	padding = flag.Int("pad", 3, "padding")
+	place   = flag.String("place", "automatic", "placing algorithm (short-side, long-side, bottom-left, area, contact-point)")
 
 	sdfRadius = flag.Int("sdf-radius", 0, "use alpha channel for distance field")
 
@@ -44,27 +43,33 @@ func main() {
 		os.Exit(1)
 	}
 
+	if *padding < *sdfRadius {
+		*padding = *sdfRadius
+	}
+
 	maxSize := image.Point{2048, 2048}
 
 	Walk(folder, pack.SupportedImages, func(name, path string) {
 		fmt.Println("adding image: ", name)
+		name = filepath.ToSlash(name)
 		m, err := pack.LoadImage(name, path)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		m.Padding = defaultPadding
+		m.Padding = *padding
 		images = append(images, m)
 	})
 
 	Walk(folder, pack.SupportedFonts, func(name, path string) {
 		fmt.Println("adding font: ", name)
+		name = filepath.ToSlash(name)
 		f, err := pack.LoadFont(name, path, 32)
 		if err != nil {
 			fmt.Println(err)
 			return
 		}
-		f.Padding = defaultPadding
+		f.Padding = *padding
 		f.IncludeExtendedAscii()
 		fonts = append(fonts, f)
 	})
@@ -115,6 +120,54 @@ func main() {
 	defer f.Close()
 
 	if err := png.Encode(f, dst); err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+
+	atlas := &Atlas{}
+	atlas.Frames = make(map[string]Frame)
+	atlas.Meta.App = "texpack"
+	atlas.Meta.Version = "1.0"
+	atlas.Meta.Image = *atlasimage
+	atlas.Meta.Format = "RGBA8888"
+	atlas.Meta.Size.Width = size.X
+	atlas.Meta.Size.Height = size.Y
+	for _, m := range images {
+		frame := Frame{
+			Name:    m.Name,
+			Rotated: m.Rotated,
+			// Trimmed: m.Trimmed,
+			Frame: Rect{
+				X:      m.Place.Min.X,
+				Y:      m.Place.Min.Y,
+				Width:  m.Place.Max.X - m.Place.Min.X,
+				Height: m.Place.Max.Y - m.Place.Min.Y,
+			},
+			SpriteSourceSize: Rect{
+				X:      0,
+				Y:      0,
+				Width:  m.Place.Max.X - m.Place.Min.X,
+				Height: m.Place.Max.Y - m.Place.Min.Y,
+			},
+			SourceSize: Size{
+				Width:  m.Place.Max.X - m.Place.Min.X,
+				Height: m.Place.Max.Y - m.Place.Min.Y,
+			},
+			Pivot: Point{0.5, 0.5},
+		}
+		atlas.Frames[frame.Name] = frame
+	}
+
+	fd, err := os.Create(*atlasdata)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	defer fd.Close()
+
+	enc := json.NewEncoder(fd)
+	enc.SetIndent("", "\t")
+	if err := enc.Encode(atlas); err != nil {
 		fmt.Println(err)
 		os.Exit(1)
 	}
