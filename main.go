@@ -8,9 +8,11 @@ import (
 	"os"
 	"path/filepath"
 
+	"github.com/loov/texpack/debugdraw"
 	"github.com/loov/texpack/maxrect"
 	"github.com/loov/texpack/pack"
 	"github.com/loov/texpack/sdf"
+	"github.com/loov/texpack/walk"
 
 	"image/color"
 	"image/gif"
@@ -49,7 +51,7 @@ func main() {
 
 	maxSize := image.Point{2048, 2048}
 
-	Walk(folder, pack.SupportedImages, func(name, path string) {
+	walk.Exts(folder, pack.SupportedImages, func(name, path string) {
 		fmt.Println("adding image: ", name)
 		name = filepath.ToSlash(name)
 		m, err := pack.LoadImage(name, path)
@@ -61,7 +63,7 @@ func main() {
 		images = append(images, m)
 	})
 
-	Walk(folder, pack.SupportedFonts, func(name, path string) {
+	walk.Exts(folder, pack.SupportedFonts, func(name, path string) {
 		fmt.Println("adding font: ", name)
 		name = filepath.ToSlash(name)
 		f, err := pack.LoadFont(name, path, 32)
@@ -107,8 +109,8 @@ func main() {
 
 	if *debug {
 		for _, box := range boxes {
-			drawRect(dst, *box.Place, color.RGBA{0, 0xFF, 0, 0x80})
-			drawRect(dst, box.Place.Inset(-box.Padding), color.RGBA{0xFF, 0, 0, 0xFF})
+			debugdraw.RectRGBA(dst, *box.Place, color.RGBA{0, 0xFF, 0, 0x80})
+			debugdraw.RectRGBA(dst, box.Place.Inset(-box.Padding), color.RGBA{0xFF, 0, 0, 0xFF})
 		}
 	}
 
@@ -187,12 +189,12 @@ func WritePlacingGif(size image.Point, boxes []pack.Box, outfile string) {
 	context.DebugPlace = func(r image.Rectangle) {
 		pal := image.NewPaletted(image.Rectangle{image.ZP, size}, palette)
 		for _, r := range context.Used {
-			drawRectPal(pal, r, 1)
+			debugdraw.RectPalette(pal, r, 1)
 		}
 		for _, r := range context.Free {
-			drawRectPal(pal, r, 2)
+			debugdraw.RectPalette(pal, r, 2)
 		}
-		drawRectPal(pal, r, 3)
+		debugdraw.RectPalette(pal, r, 3)
 
 		out.Image = append(out.Image, pal)
 		out.Delay = append(out.Delay, 0)

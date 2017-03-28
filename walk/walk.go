@@ -1,4 +1,4 @@
-package main
+package walk
 
 import (
 	"os"
@@ -6,7 +6,7 @@ import (
 	"strings"
 )
 
-func Walk(folder string, exts []string, found func(name, filename string)) {
+func Exts(folder string, exts []string, found func(name, filename string)) {
 	filepath.Walk(folder, func(path string, info os.FileInfo, err error) error {
 		if err != nil {
 			return err
@@ -15,8 +15,7 @@ func Walk(folder string, exts []string, found func(name, filename string)) {
 			return nil
 		}
 
-		ext := strings.ToLower(filepath.Ext(path))
-		if !MatchesAny(exts, ext) {
+		if !matchesAny(exts, filepath.Ext(path)) {
 			return nil
 		}
 
@@ -31,9 +30,10 @@ func Walk(folder string, exts []string, found func(name, filename string)) {
 	})
 }
 
-func MatchesAny(xs []string, s string) bool {
+func matchesAny(xs []string, s string) bool {
+	s = strings.ToLower(s)
 	for _, x := range xs {
-		if x == s {
+		if strings.ToLower(x) == s {
 			return true
 		}
 	}

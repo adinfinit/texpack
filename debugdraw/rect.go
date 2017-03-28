@@ -1,11 +1,11 @@
-package main
+package debugdraw
 
 import (
 	"image"
 	"image/color"
 )
 
-func drawRect(rgba *image.RGBA, bounds image.Rectangle, color color.RGBA) {
+func RectRGBA(rgba *image.RGBA, bounds image.Rectangle, color color.RGBA) {
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {
 		rgba.SetRGBA(x, bounds.Min.Y, color)
 		rgba.SetRGBA(x, bounds.Max.Y-1, color)
@@ -16,7 +16,7 @@ func drawRect(rgba *image.RGBA, bounds image.Rectangle, color color.RGBA) {
 	}
 }
 
-func drawRectPal(m *image.Paletted, bounds image.Rectangle, color uint8) {
+func RectPalette(m *image.Paletted, bounds image.Rectangle, color uint8) {
 	for x := bounds.Min.X; x < bounds.Max.X; x++ {
 		m.SetColorIndex(x, bounds.Min.Y, color)
 		m.SetColorIndex(x, bounds.Max.Y-1, color)
