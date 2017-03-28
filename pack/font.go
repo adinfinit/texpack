@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"image"
 	"io/ioutil"
+	"strconv"
 	"unicode"
 
 	"github.com/golang/freetype/truetype"
@@ -56,8 +57,9 @@ func LoadFont(name, filename string, fontSize int) (*Font, error) {
 
 func (font *Font) Boxes() []Box {
 	boxes := []Box{}
-	for _, g := range font.Glyphs {
+	for r, g := range font.Glyphs {
 		boxes = append(boxes, Box{
+			Name:    font.Name + "_" + strconv.Itoa(int(r)),
 			Padding: font.Padding,
 			Size:    g.Size,
 			Place:   &g.Place,

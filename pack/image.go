@@ -36,6 +36,7 @@ type Image struct {
 
 func (m *Image) Box() Box {
 	return Box{
+		Name:    m.Name,
 		Padding: m.Padding,
 		Size:    m.Size,
 		Place:   &m.Place,

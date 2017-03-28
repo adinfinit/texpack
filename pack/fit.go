@@ -9,6 +9,7 @@ import (
 )
 
 type Box struct {
+	Name    string
 	Padding int
 	Size    image.Point
 	Place   *image.Rectangle
@@ -27,7 +28,7 @@ func SortBoxes(boxes []Box) {
 		} else if a.Size.Y < b.Size.Y {
 			return false
 		}
-		return false
+		return a.Name < b.Name
 	})
 }
 
