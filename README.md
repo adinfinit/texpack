@@ -10,7 +10,7 @@ It also has also signed-distance-field support.
 ## Installing
 
 ```
-go get github.com/loov/texpack
+go get github.com/adinfinit/texpack
 ```
 
 ## sub-packages

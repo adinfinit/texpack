@@ -5,7 +5,7 @@ import (
 	"image"
 	"sort"
 
-	"github.com/loov/texpack/maxrect"
+	"github.com/adinfinit/texpack/maxrect"
 )
 
 type Box struct {

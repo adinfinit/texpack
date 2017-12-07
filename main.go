@@ -8,11 +8,11 @@ import (
 	"os"
 	"path/filepath"
 
-	"github.com/loov/texpack/debugdraw"
-	"github.com/loov/texpack/maxrect"
-	"github.com/loov/texpack/pack"
-	"github.com/loov/texpack/sdf"
-	"github.com/loov/texpack/walk"
+	"github.com/adinfinit/texpack/debugdraw"
+	"github.com/adinfinit/texpack/maxrect"
+	"github.com/adinfinit/texpack/pack"
+	"github.com/adinfinit/texpack/sdf"
+	"github.com/adinfinit/texpack/walk"
 
 	"image/color"
 	"image/gif"
