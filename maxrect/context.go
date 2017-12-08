@@ -1,4 +1,4 @@
-// maxrect implements MaxRects algorithm
+// maxrect implements MaxRects packing algorithm
 package maxrect
 
 import "image"

@@ -1,4 +1,4 @@
-// pack implements packing common things
+// pack implements packing using maxrects algorithm
 package pack
 
 import (

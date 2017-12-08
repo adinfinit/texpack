@@ -1,3 +1,5 @@
+// debugdraw package implements drawing red rectangles to *image.RGBA
+// for debugging purposes
 package debugdraw
 
 import (

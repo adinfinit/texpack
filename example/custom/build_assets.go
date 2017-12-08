@@ -21,7 +21,6 @@ import (
 
 	"github.com/adinfinit/texpack/maxrect"
 	"github.com/adinfinit/texpack/pack"
-	"github.com/adinfinit/texpack/sdf"
 	"github.com/adinfinit/texpack/walk"
 )
 
@@ -33,7 +32,6 @@ var (
 	padding   = 3
 	smoothpad = 1 // added to all images to avoid interpolation issues near quad borders
 	fontSize  = 64
-	applySDF  = false
 	maxSize   = image.Point{2048, 2048}
 
 	// for some images we may want to skip smooth borders,
@@ -115,11 +113,6 @@ func main() {
 			g.Bounds.Max = g.Bounds.Max.Add(fixed.P(smoothpad, smoothpad))
 			g.Place = g.Place.Inset(-smoothpad)
 		}
-	}
-
-	// make it a signed distance field
-	if applySDF {
-		sdf.ApplyRGBA_Alpha(dst, padding-1)
 	}
 
 	{ // save image atlas to a file
