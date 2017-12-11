@@ -69,7 +69,7 @@ func main() {
 		}
 		f.Padding = padding
 		// specify which characters to include in the font
-		f.IncludeExtendedAscii()
+		f.IncludeAscii()
 		fonts = append(fonts, f)
 	})
 
