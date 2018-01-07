@@ -92,7 +92,7 @@ func minimizeFit(maxContextSize image.Point, rule maxrect.Rule, sizes []image.Po
 				rects = tryRects
 				shrunk = true
 			} else {
-				shrinkX = false
+				shrinkY = false
 			}
 		}
 	}
