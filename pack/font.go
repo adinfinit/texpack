@@ -132,22 +132,22 @@ func (font *Font) includeKern(x rune) {
 	}
 }
 
+// Glyph represents a drawable symbol from a font.
 //
-//   advance          ----  maxAscent
-//  |-------|          |
-//           ■■■      ----  bounds.Max.Y
-//          ■   ■      |
-//          ■          |
-//   ■■■■    ■■■■      |
-//  ■    ■       ■     |
-//  ■    ■       ■     |
-//  •■■■■■  •■■■■   • ----  point.Y
-//       ■             |
-//  ■    ■             |
-//   ■■■■             ----  bounds.Min.Y
-//                     |
-//                    ----  maxDescent
-//
+//     advance          ----  maxAscent
+//    |-------|          |
+//             ■■■      ----  bounds.Max.Y
+//            ■   ■      |
+//            ■          |
+//     ■■■■    ■■■■      |
+//    ■    ■       ■     |
+//    ■    ■       ■     |
+//    •■■■■■  •■■■■   • ----  point.Y
+//         ■             |
+//    ■    ■             |
+//     ■■■■             ----  bounds.Min.Y
+//                       |
+//                      ----  maxDescent
 type Glyph struct {
 	Rune    rune
 	Size    image.Point         // destination size in pixels
